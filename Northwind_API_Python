@@ -1,0 +1,43 @@
+import requests
+import psycopg2
+import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy import text
+from sqlalchemy.engine import Connection
+
+# Define the API URL
+api_url = "https://demodata.grapecity.com/northwind/api/v1/Shippers"
+
+# Fetch data from the API
+response = requests.get(api_url, headers={"Content-Type": "application/json"})
+data = response.json()
+
+# Convert JSON data to a DataFrame
+df = pd.DataFrame(data)
+
+# Define your PostgreSQL connection parameters
+user = "UserName"
+password = "Password"
+host = "localhost"
+port = "5432"
+database = "Northwind"
+
+# Create SQLAlchemy engine
+engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
+
+# Define the table name
+table_name = "API_shipper"
+
+# Define a CREATE TABLE IF NOT EXISTS statement
+create_table_sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (shipper_id INTEGER PRIMARY KEY,company_name TEXT,phone TEXT);"""
+
+# Ensure the table exists with the proper structure
+with engine.connect() as connection:  # type: Connection
+    connection.execute(text(create_table_sql))
+
+
+# Write data to PostgreSQL
+df.to_sql(table_name, engine, if_exists="append", index=False)
+
+
+print(f"Data successfully loaded into the {table_name} table in PostgreSQL.")
