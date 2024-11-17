@@ -7,3 +7,24 @@ CREATE DATABASE "MRR"
     LOCALE_PROVIDER = 'libc'
     CONNECTION LIMIT = -1
     IS_TEMPLATE = False;
+
+--==================Create MRR Tables on Postgres DB
+
+-- Table: public.category
+
+-- DROP TABLE IF EXISTS public.category;
+
+CREATE TABLE IF NOT EXISTS public.category
+(
+    categoryid integer NOT NULL,
+    categoryname character varying(15) COLLATE pg_catalog."default" NOT NULL,
+    description text COLLATE pg_catalog."default",
+	DWH_Created_Date timestamp,
+	DWH_Updated_Date timestamp,
+    CONSTRAINT category_pkey PRIMARY KEY (categoryid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.category
+    OWNER to postgres;
