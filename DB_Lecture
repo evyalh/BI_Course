@@ -28,3 +28,47 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.category
     OWNER to postgres;
+
+--==================Query systables on Postgres DB
+
+--Get a List of Tables
+--This query lists all the tables in the current database under a specific schema (e.g., public):
+
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+  AND table_type = 'BASE TABLE'
+ORDER BY table_schema, table_name;
+
+--Get a List of Indexes per Table
+--This query lists all indexes for each table in the current database:
+
+SELECT 
+    t.relname AS table_name,
+    i.relname AS index_name,
+    pg_size_pretty(pg_relation_size(i.oid)) AS index_size
+FROM 
+    pg_class t
+JOIN 
+    pg_index ix ON t.oid = ix.indrelid
+JOIN 
+    pg_class i ON i.oid = ix.indexrelid
+WHERE 
+    t.relkind = 'r'  -- Filter only tables
+ORDER BY 
+    t.relname, i.relname;
+
+--Get Storage Quota per Table
+--This query provides the size of each table, including indexes and total size:
+
+SELECT 
+    relname AS table_name,
+    pg_size_pretty(pg_table_size(oid)) AS table_size,
+    pg_size_pretty(pg_indexes_size(oid)) AS indexes_size,
+    pg_size_pretty(pg_total_relation_size(oid)) AS total_size
+FROM 
+    pg_class
+WHERE 
+    relkind = 'r'  -- Filter only tables
+ORDER BY 
+    total_size DESC;
