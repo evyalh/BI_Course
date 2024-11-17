@@ -1,4 +1,144 @@
 --========================================================================
+--==================Basic entities on Postgres DB
+--========================================================================
+
+--==================VIEW
+
+CREATE VIEW customer_managers AS
+SELECT 
+    custid, 
+    companyname, 
+    contactname, 
+    contacttitle, 
+    address, 
+    city, 
+    region, 
+    postalcode, 
+    country, 
+    phone, 
+    fax
+FROM 
+    public.customer
+WHERE 
+    contacttitle LIKE '%Manager%' 
+    OR contacttitle LIKE '%Owner%';
+
+
+--==================PROCEDURE
+
+
+--==================Create new table
+-- DROP TABLE IF EXISTS public.product_restock;
+
+CREATE TABLE IF NOT EXISTS public.product_restock
+(
+    productid integer NOT NULL DEFAULT nextval('product_productid_seq'::regclass),
+    productname character varying(40) COLLATE pg_catalog."default" NOT NULL,
+    supplierid integer,
+    categoryid integer,
+    quantityperunit character varying(20) COLLATE pg_catalog."default",
+    unitprice numeric(10,2),
+    unitsinstock smallint,
+    unitsonorder smallint,
+    reorderlevel smallint,
+    discontinued character(1) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT product_restock_pkey PRIMARY KEY (productid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.product
+    OWNER to postgres;
+
+--==================Populate new table
+INSERT INTO public.product_restock (
+    productid, 
+    productname, 
+    supplierid, 
+    categoryid, 
+    quantityperunit, 
+    unitprice, 
+    unitsinstock, 
+    unitsonorder, 
+    reorderlevel, 
+    discontinued
+)
+SELECT 
+    productid, 
+    productname, 
+    supplierid, 
+    categoryid, 
+    quantityperunit, 
+    unitprice, 
+    unitsinstock, 
+    unitsonorder, 
+    reorderlevel, 
+    discontinued
+FROM public.product;
+
+--==================PROCEDURE
+
+--Function to Calculate and Apply Percentage Increase
+
+CREATE OR REPLACE PROCEDURE update_products_prices(supplier_id INT, percentage INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Update the price for products of specific supplier
+    UPDATE product_restock
+    SET unitprice = cast(unitprice * (1 + (percentage * 1.0 / 100)) as numeric(10,2))
+    WHERE supplierid = supplier_id;
+
+    -- Raise a notice to indicate the operation
+    RAISE NOTICE 'Products by Supplier ID # % experienced price change by % percentage.', supplier_id, percentage;
+END;
+$$;
+
+CALL update_products_prices(7, 10);
+
+select supplierid, unitprice
+from product_restock
+where supplierid=7
+order by 2 limit 5
+
+select supplierid, unitprice
+from product
+where supplierid=7
+order by 2 limit 5
+
+
+--==================FUNCTION
+
+--Get Total Sales by Employee
+--This function calculates the total sales (order amounts) for a given employee, optionally filtered by a year
+
+CREATE OR REPLACE FUNCTION get_total_sales_by_employee(employee_id INT, sales_year INT DEFAULT NULL)
+RETURNS NUMERIC
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    total_sales NUMERIC := 0;
+BEGIN
+    SELECT SUM(od.unitprice * od.qty * (1 - od.discount))
+    INTO total_sales
+    FROM salesorder o
+    JOIN orderdetail od ON o.orderid = od.orderid
+    WHERE o.empid = employee_id
+      AND (sales_year IS NULL OR EXTRACT(YEAR FROM o.orderdate) = sales_year);
+
+    RETURN total_sales;
+END;
+$$;
+
+--Get total sales for a specific employee without year filtering:
+
+SELECT get_total_sales_by_employee(5);
+
+--Get total sales for a specific employee for a specific year:
+
+SELECT get_total_sales_by_employee(5, 2006);
+
+--========================================================================
 --==================Query systables on Postgres DB
 --========================================================================
 
