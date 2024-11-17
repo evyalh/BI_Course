@@ -55,8 +55,9 @@ JOIN
     pg_class i ON i.oid = ix.indexrelid
 WHERE 
     t.relkind = 'r'  -- Filter only tables
-ORDER BY 
-    t.relname, i.relname;
+	--AND t.relname NOT LIKE 'pg_%'
+ORDER BY index_size desc 
+    --t.relname, i.relname;
 
 --Get Storage Quota per Table
 --This query provides the size of each table, including indexes and total size:
@@ -70,5 +71,6 @@ FROM
     pg_class
 WHERE 
     relkind = 'r'  -- Filter only tables
+	AND relname NOT LIKE 'pg_%'
 ORDER BY 
     total_size DESC;
