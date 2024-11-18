@@ -26,7 +26,6 @@ WHERE
 
 --==================PROCEDURE
 
-
 --==================Create new table
 -- DROP TABLE IF EXISTS public.product_restock;
 
@@ -233,7 +232,10 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.category
     OWNER to postgres;
 
+
+--========================================================================
 --==================Query systables on Postgres DB
+--========================================================================
 
 --Get a List of Tables
 --This query lists all the tables in the current database under a specific schema (e.g., public):
@@ -278,3 +280,38 @@ WHERE
 	AND relname NOT LIKE 'pg_%'
 ORDER BY 
     total_size DESC;
+
+--Get analize and vacuum stats on tables
+
+SELECT 
+    schemaname,
+    relname AS table_name,
+    last_analyze, 
+    last_autoanalyze, 
+    last_vacuum, 
+    last_autovacuum
+FROM 
+    pg_stat_all_tables
+WHERE 
+    schemaname NOT IN ('pg_catalog', 'information_schema') -- Exclude system schemas
+	AND relname NOT LIKE 'pg_%'
+ORDER BY 
+    GREATEST(
+        COALESCE(last_analyze, '1970-01-01'), 
+        COALESCE(last_autoanalyze, '1970-01-01'), 
+        COALESCE(last_vacuum, '1970-01-01'), 
+        COALESCE(last_autovacuum, '1970-01-01')
+    ) DESC;
+
+--Analize & Vacuum specific table 
+ANALYZE public.shipper;
+VACUUM public.shipper;
+VACUUM FULL public.shipper; --(full clean)
+
+--Analize entire db
+ANALYZE;
+
+
+
+
+
