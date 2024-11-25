@@ -1,13 +1,22 @@
 --===================================
 -- SQL Order example 
 --===================================
-SELECT country, count(*) employee_count -->6
+SELECT employee.country, count(*) employee_order_count -->6
 FROM public.salesorder -->1
-JOIN public.employee ON salesorder.empid = employee.empid -->2
+JOIN public.employee 
+ON salesorder.empid = employee.empid -->2
 WHERE lower(titleofcourtesy) like '%mr%' -->3
 GROUP BY country -->4
 HAVING COUNT(*)>160 -->5
-ORDER BY employee_count DESC; -->7
+ORDER BY employee_order_count ASC; -->7
+
+
+SELECT * FROM public.salesorder
+
+SELECT country,count(*) as employee_count 
+FROM public.employee
+group by country
+ORDER BY employee_count
 
 --===================================
 -- 1: Basic Arithmetic Operations  
@@ -29,6 +38,9 @@ FROM Orderdetail;
 
 -- Division (/):
 SELECT Freight / 100 AS FreightInHundreds 
+FROM salesorder;
+
+SELECT Freight / tax AS FreightInHundreds 
 FROM salesorder;
 
 -- Modulo (%): 
@@ -55,8 +67,11 @@ FROM salesorder;
 SELECT MIN(UnitPrice) AS MinPrice 
 FROM Product;
 
+SELECT MAX(UnitPrice) AS MinPrice 
+FROM Product;
+
 -- COUNT: Counts the number of rows or non-NULL values.  
-SELECT COUNT(*) AS TotalOrders 
+SELECT COUNT(1) AS TotalOrders 
 FROM salesorder;
 
 --===================================
@@ -64,8 +79,13 @@ FROM salesorder;
 --===================================
 
 -- The DISTINCT keyword ensures unique values in results:  
+SELECT Country
+FROM Customer
+ORDER BY 1;
+
 SELECT DISTINCT Country 
-FROM Customer;
+FROM Customer
+ORDER BY 1;
 
 -- Counting unique values:  
 SELECT COUNT(DISTINCT Country) AS UniqueCountries 
@@ -77,8 +97,9 @@ FROM Customer;
 
 -- LIMIT:  Retrieve the first 5 customers from the table.
 SELECT * 
-FROM Customer 
-LIMIT 5;
+FROM Customer
+order by 1 desc
+LIMIT 8;
 
 -- OFFSET: Skip the first 10 rows and retrieve the next 5.
 SELECT * 
@@ -106,6 +127,12 @@ LIMIT 3;
 -- ROUND: Rounds numeric values to two decimal places.
 SELECT ROUND(UnitPrice, 2) AS RoundedPrice 
 FROM Product;
+
+SELECT Freight / 100 AS FreightInHundreds 
+FROM salesorder;
+
+SELECT ROUND(Freight / 100 ,4) AS FreightInHundreds 
+FROM salesorder;
 
 -- CEIL / FLOOR: Round up or down to the nearest whole number.
 SELECT 
@@ -142,9 +169,9 @@ where orderid in (10248,10249,10250);
 -- Date and Time Types: DATE, TIMESTAMP
 
 -- Querying column data types:
-SELECT column_name, data_type 
+SELECT table_name,column_name, data_type 
 FROM information_schema.columns 
-WHERE table_name = 'employee';
+WHERE table_name = 'salesorder';
 
 --===================================
 -- 8: Casting  
@@ -200,7 +227,10 @@ FROM Product;
 -- Find customers whose names contain "Shop".
 SELECT contactname 
 FROM Customer 
-WHERE contactname LIKE '%Ja%';
+--WHERE contactname LIKE '%Ja%';
+--WHERE contactname LIKE '%Ja';
+WHERE contactname LIKE '%el';
+
 
 --===================================
 -- 12: Conditional Logic with CASE  
@@ -238,17 +268,6 @@ group by PriceCategory;
 SELECT ProductName 
 FROM Product 
 WHERE CategoryID = (SELECT CategoryID FROM Category WHERE CategoryName = 'Beverages');
-
---===================================
--- 14: Self Joins  
---===================================
-
--- Self joins compare rows within the same table.
-
--- Example: Match managers with their employees.
-SELECT A.EmpID AS Manager, B.EmpID AS Employee 
-FROM Employee A 
-JOIN Employee B ON A.EmpID = B.ReportsTo;
 
 --===================================
 -- 15: Transactions  
@@ -334,4 +353,3 @@ JOIN salesOrder ON OrderDetail.OrderID = salesOrder.OrderID
 GROUP BY CustID
 ORDER BY TotalRevenue DESC
 LIMIT 5;
-
