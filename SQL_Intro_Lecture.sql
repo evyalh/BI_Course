@@ -13,23 +13,25 @@ ORDER BY employee_count DESC; -->7
 -- 1: Basic Arithmetic Operations  
 --===================================
 
--- Addition (+): Calculate the total cost of items in an order.
-SELECT UnitPrice + qty AS TotalCost 
+-- Addition (+): 
+SELECT qty,
+qty + 5 AS Increase_Qty 
 FROM Orderdetail;
 
--- Subtraction (-): Determine the net quantity after applying a discount.
-SELECT UnitPrice - Discount AS NetQuantity 
+-- Subtraction (-): 
+SELECT qty, 
+qty - 5 AS Decrease_Qty 
 FROM Orderdetail;
 
--- Multiplication (*): Calculate total revenue from a product.
+-- Multiplication (*): 
 SELECT qty * UnitPrice AS TotalRevenue 
 FROM Orderdetail;
 
--- Division (/): Convert freight costs into hundreds for better readability.
+-- Division (/):
 SELECT Freight / 100 AS FreightInHundreds 
 FROM salesorder;
 
--- Modulo (%): Identify even or odd orders by checking remainders.
+-- Modulo (%): 
 SELECT empid, OrderID, OrderID % 2 AS IsEven 
 FROM salesorder;
 
@@ -145,7 +147,42 @@ FROM information_schema.columns
 WHERE table_name = 'employee';
 
 --===================================
--- 8: Aliases  
+-- 8: Casting  
+--===================================
+
+select 
+custid,
+cast(custid as integer),
+freight,
+cast(freight as integer)
+FROM salesorder
+
+--===================================
+-- 9: Dates  
+--===================================
+
+-- CURRENT_DATE():
+SELECT CURRENT_DATE
+
+-- EXTRACT:
+SELECT OrderDate
+,EXTRACT(YEAR FROM OrderDate) AS Year
+,EXTRACT(QUARTER FROM OrderDate) AS QUARTER
+,EXTRACT(MONTH FROM OrderDate) AS MONTH
+,EXTRACT(WEEK FROM OrderDate) AS WEEK
+,EXTRACT(DAY FROM OrderDate) AS DAY
+FROM salesOrder 
+limit 10;
+
+-- DATEDIFF:
+SELECT requireddate - shippeddate AS date_diff
+FROM salesOrder;
+
+SELECT AGE(requireddate, shippeddate) AS date_diff
+FROM salesOrder;
+
+--===================================
+-- 10: Aliases  
 --===================================
 
 -- Aliases make column and table names more readable.
@@ -155,7 +192,7 @@ SELECT ProductName AS Product, UnitPrice AS Price
 FROM Product;
 
 --===================================
--- 9: Pattern Matching  
+-- 11: Pattern Matching  
 --===================================
 
 -- Use LIKE with % and _ for pattern-based filtering.
@@ -166,7 +203,7 @@ FROM Customer
 WHERE contactname LIKE '%Ja%';
 
 --===================================
--- 10: Conditional Logic with CASE  
+-- 12: Conditional Logic with CASE  
 --===================================
 
 -- Use CASE for conditional expressions in queries.
@@ -180,7 +217,7 @@ SELECT ProductName,
 FROM Product;
 
 --===================================
--- 11: Subqueries  
+-- 13: Subqueries  
 --===================================
 
 -- Subqueries are nested queries that provide data for the main query.
@@ -203,7 +240,7 @@ FROM Product
 WHERE CategoryID = (SELECT CategoryID FROM Category WHERE CategoryName = 'Beverages');
 
 --===================================
--- 12: Self Joins  
+-- 14: Self Joins  
 --===================================
 
 -- Self joins compare rows within the same table.
@@ -214,7 +251,7 @@ FROM Employee A
 JOIN Employee B ON A.EmpID = B.ReportsTo;
 
 --===================================
--- 13: Transactions  
+-- 15: Transactions  
 --===================================
 
 -- Transactions ensure data consistency during operations.
@@ -231,7 +268,7 @@ UPDATE Products SET UnitPrice = UnitPrice * 1.1 WHERE CategoryID = 1;
 ROLLBACK;
 
 --===================================
--- 14: Views  
+-- 16: Views  
 --===================================
 
 -- A view is a virtual table created from a query.
@@ -248,7 +285,7 @@ limit 10;
 SELECT * FROM Top10Customers;
 
 --===================================
--- 15: Common Table Expressions (CTEs)
+-- 17: Common Table Expressions (CTEs)
 --===================================
 
 -- CTEs simplify complex queries and improve readability.
@@ -265,7 +302,7 @@ WHERE TotalFreight > 100;
 
 
 --===================================
--- 16: Combining SQL Features  
+-- 18: Combining SQL Features  
 --===================================
 
 -- This query returns customers with total freight charges exceeding 1000, sorted by average freight in descending order, showing the top 5.  
