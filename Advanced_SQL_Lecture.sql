@@ -54,6 +54,29 @@ FROM Supplier
 FULL OUTER JOIN Product 
 ON Supplier.SupplierID = Product.SupplierID;
 
+--========================================================
+--====================Join – Star Schema==================
+--========================================================
+SELECT 
+    Product.ProductName, 
+    SUM(OrderDetail.qty * Product.UnitPrice) AS TotalRevenue
+FROM OrderDetail
+JOIN Product ON OrderDetail.ProductID = Product.ProductID
+GROUP BY Product.ProductName
+
+
+--========================================================
+--====================Join – Snowflake====================
+--========================================================
+SELECT 
+    Category.CategoryName, 
+    SUM(OrderDetail.qty * Product.UnitPrice) AS TotalRevenue, 
+    AVG(Product.UnitPrice) AS AveragePrice
+FROM OrderDetail
+JOIN Product ON OrderDetail.ProductID = Product.ProductID
+JOIN Category ON Product.CategoryID = Category.CategoryID
+GROUP BY Category.CategoryName
+
 
 
 
