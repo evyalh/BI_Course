@@ -76,27 +76,3 @@ FROM OrderDetail
 JOIN Product ON OrderDetail.ProductID = Product.ProductID
 JOIN Category ON Product.CategoryID = Category.CategoryID
 GROUP BY Category.CategoryName
-
-
---========================================================
---===================Class Exercise=======================
---========================================================
---Exercise 1: Employee Order Insights
---Task: Find the top 5 employees with the highest number of processed orders. 
---Include their names, total orders processed, and indicate whether the count is "High" (above 50 orders) or "Moderate" (50 or fewer). Use COUNT, JOIN, and CASE.
-
---Solution:
-
-SELECT 
-    Employee.FirstName || ' ' || Employee.LastName AS EmployeeName,
-    COUNT(salesOrder.OrderID) AS TotalOrdersProcessed,
-    CASE 
-        WHEN COUNT(salesOrder.OrderID) > 50 THEN 'High'
-        ELSE 'Moderate'
-    END AS OrderLevel
-FROM Employee
-JOIN salesOrder ON Employee.EmpID = salesOrder.EmpID
-GROUP BY Employee.FirstName, Employee.LastName
-ORDER BY TotalOrdersProcessed DESC
-LIMIT 5;
-
