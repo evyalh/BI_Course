@@ -24,7 +24,7 @@ GRANT ALL ON SCHEMA dwh TO pg_database_owner;
 CREATE TABLE dwh.Dim_Products (
     ID SERIAL ,                     -- Auto-incrementing unique key
     Product_ID INTEGER NOT NULL PRIMARY KEY,               -- Product ID from the source data
-    Product_Name CHARACTER VARYING(20),        -- Product Name
+    Product_Name CHARACTER VARYING(255),        -- Product Name
     Supplier_ID INTEGER,                       -- Supplier ID
     Category_ID INTEGER,                       -- Category ID
     Unit_Price FLOAT,                          -- Unit Price
