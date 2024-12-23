@@ -1,0 +1,19 @@
+Adding Columns
+  
+Create the following new Columns by right clicking on Transactions table -> New column 
+  
+  Last Refreshed - DAX Syntax: Last_Refreshed = "Last Refreshed: "& TODAY() 
+
+  Revenue Per Sale - DAX Syntax: Revenue_Per_Sale = Transactions[Quantity] * Transactions[Unit Price] 
+
+Adding Measures 
+
+For Measure fields, right click on Transactions table -> New measure 
+
+    Unique Customers - DAX Syntax: Count_Unique_Customers = DISTINCTCOUNT(Transactions[Customer_Key]) 
+
+    Unique Suppliers - DAX Syntax: Count_Unique_Suppliers = DISTINCTCOUNT(Transactions[Supplier_Key]) 
+
+    Total sales amount - DAX Syntax: Total_Sales_Amount = SUM(Transactions[Revenue Per Sale]) 
+
+    Total sales of Product A only - DAX Syntax: Total_Sales_Product_A_Only = CALCULATE(SUM(Transactions[Revenue Per Sale]),Transactions[Products_Key]="A")  
