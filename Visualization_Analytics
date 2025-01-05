@@ -1,0 +1,18 @@
+--Create Time Dimension
+
+let
+    StartDate = #date(2020, 1, 1),  // תאריך התחלה
+    EndDate = #date(2025, 12, 31),  // תאריך סיום
+    Source = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1,0,0,0)),
+    TableFromList = Table.FromList(Source, Splitter.SplitByNothing(), {"Date"}),
+    ChangedType = Table.TransformColumnTypes(TableFromList, {"Date", type date}),
+    AddedYear = Table.AddColumn(ChangedType, "Year", each Date.Year([Date])),
+    AddedMonth = Table.AddColumn(AddedYear, "Month", each Date.Month([Date])),
+    AddedMonthName = Table.AddColumn(AddedMonth, "MonthName", each Date.ToText([Date], "MMMM")),
+    AddedQuarter = Table.AddColumn(AddedMonthName, "Quarter", each "Q" & Number.ToText(Date.QuarterOfYear([Date]))),
+    AddedWeekday = Table.AddColumn(AddedQuarter, "Weekday", each Date.DayOfWeek([Date]) + 1),
+    AddedWeekdayName = Table.AddColumn(AddedWeekday, "WeekdayName", each Date.ToText([Date], "dddd")),
+    AddedDay = Table.AddColumn(AddedWeekdayName, "Day", each Date.Day([Date])),
+    AddedIsWeekend = Table.AddColumn(AddedDay, "IsWeekend", each if Date.DayOfWeek([Date], Day.Monday) >= 5 then "Yes" else "No")
+in
+    AddedIsWeekend
