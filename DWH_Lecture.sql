@@ -140,8 +140,8 @@ FROM public.supplier;
 --DDL
 CREATE TABLE dwh.Fact_Order_Details (
     ID SERIAL , -- Generated Key (ID+1)
-    Order_ID INTEGER NOT NULL PRIMARY KEY, -- PK: Order ID
-    Product_ID INTEGER NOT NULL PRIMARY KEY, -- PK: Product ID
+    Order_ID INTEGER NOT NULL, -- PK: Order ID
+    Product_ID INTEGER NOT NULL, -- PK: Product ID
     Unit_Price FLOAT, -- Unit Price
     Quantity INTEGER, -- Quantity
     Discount FLOAT, -- Discount Percentage
@@ -149,7 +149,8 @@ CREATE TABLE dwh.Fact_Order_Details (
     Total_Discount FLOAT, -- Total Discount (Quantity * Unit Price * Discount)
     Net_Income FLOAT, -- Net Income (Total Revenue - Total Discount)
     DWH_Created_Date TIMESTAMP DEFAULT NOW(), -- Operational Field: Created Date
-    DWH_Updated_Date TIMESTAMP DEFAULT NOW() -- Operational Field: Updated Date
+    DWH_Updated_Date TIMESTAMP DEFAULT NOW(), -- Operational Field: Updated Date
+    PRIMARY KEY (Order_ID, Product_ID) -- Composite Primary Key
 );
 
 --DML
