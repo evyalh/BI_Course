@@ -265,5 +265,51 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.category
     OWNER to postgres;
 
+--========================================================================
+--==================Get fields data type per table
+--========================================================================
+
+SELECT 
+    c.table_schema,
+    c.table_name,
+    c.column_name,
+    c.data_type,
+    CASE 
+        WHEN pk.column_name IS NOT NULL THEN 'YES' 
+        ELSE 'NO' 
+    END AS is_primary_key,
+    CASE 
+        WHEN ix.column_name IS NOT NULL THEN 'YES' 
+        ELSE 'NO' 
+    END AS is_indexed
+FROM information_schema.columns c
+LEFT JOIN (
+    -- Find primary keys
+    SELECT 
+        kcu.table_schema, 
+        kcu.table_name, 
+        kcu.column_name
+    FROM information_schema.key_column_usage kcu
+    JOIN information_schema.table_constraints tc 
+        ON kcu.constraint_name = tc.constraint_name
+    WHERE tc.constraint_type = 'PRIMARY KEY'
+) pk ON c.table_schema = pk.table_schema 
+    AND c.table_name = pk.table_name 
+    AND c.column_name = pk.column_name
+LEFT JOIN (
+    -- Find indexed columns
+    SELECT 
+        i.schemaname AS table_schema,
+        i.tablename AS table_name,
+        a.attname AS column_name
+    FROM pg_indexes i
+    JOIN pg_class c ON i.tablename = c.relname
+    JOIN pg_attribute a ON c.oid = a.attrelid
+    JOIN pg_index ix ON c.oid = ix.indrelid AND a.attnum = ANY(ix.indkey)
+) ix ON c.table_schema = ix.table_schema 
+    AND c.table_name = ix.table_name 
+    AND c.column_name = ix.column_name
+WHERE c.table_schema = 'public' -- Adjust schema if needed
+ORDER BY c.table_schema, c.table_name, c.ordinal_position;
 
 
